@@ -19,54 +19,73 @@ sub new {
     }, $class;
 }
 
-sub directory_exists {
+sub organize {
+    my $self = shift;
+
+    if(! $self->_check_directory_exists()) {
+        die("$self->{directory} not exists");
+    }
+
+    if(! $self->_check_directory_has_images()) {
+        die("No images files in $self->{directory}");
+    }
+
+    # check directory has images in it
+    # prompt organize files??
+    # loop files
+        # select first file
+        # compose destination
+            # destination directory (hour)
+            # is there a file in the same time?
+                # append _1 to filename
+                # filename
+        # copy to destination
+        # delete origin file
+    # end loop files
+    # exit
+}
+
+sub _check_directory_exists {
     my $self = shift;
 
     return -d $self->{directory};
 }
 
-sub list_files {
+sub _check_directory_has_images {
     my $self = shift;
-
-    if(! $self->directory_exists()) {
-        die("$self->{directory} not exists");
-    }
 
     my $directory_files_glob = $self->{directory} . "/*.{" . join(',', FILE_EXTENSIONS) . '}';
-
     my @files = glob( $directory_files_glob );
-    if(! scalar(@files)) {
-        die("No image files in $self->{directory}");
-    }
 
-    foreach (@files) {
-        # copy("sourcefile", "destinationfile") or die "Copy failed: $!";
-        print $self->get_file_dest_directory($_) . "\n";
-    }
-
-    print "Total files: " . scalar(@files) . "\n";
+    return scalar(@files);
 }
 
-sub get_file_dest_directory {
-    my $exifTool = new Image::ExifTool;
-    my $directory_name = 'unknown_date';
-    my $self = shift;
+# sub list_files {
+#     my $self = shift;
 
-    my $info = $exifTool->ImageInfo($_);
+#     foreach (@files) {
+#         # copy("sourcefile", "destinationfile") or die "Copy failed: $!";
+#         print $self->get_file_dest_directory($_) . "\n";
+#     }
 
-    if($info->{CreateDate}) {
-        my ($date, $time) = split(' ', $info->{CreateDate});
-        my @date_components = split(':', $date);
+#     print "Total files: " . scalar(@files) . "\n";
+# }
 
-        $directory_name = join('-', @date_components);
-    }
+# sub get_file_dest_directory {
+#     my $exifTool = new Image::ExifTool;
+#     my $directory_name = 'unknown_date';
+#     my $self = shift;
 
-    return "$self->{directory}/$directory_name";
-}
+#     my $info = $exifTool->ImageInfo($_);
 
-sub to_string {
-    my $self = shift;
-    return "Directory: $self->{directory}\nFile type: $self->{file_type}\n";
-}
+#     if($info->{CreateDate}) {
+#         my ($date, $time) = split(' ', $info->{CreateDate});
+#         my @date_components = split(':', $date);
+
+#         $directory_name = join('-', @date_components);
+#     }
+
+#     return "$self->{directory}/$directory_name";
+# }
 
 1;
