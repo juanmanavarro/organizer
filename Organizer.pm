@@ -8,7 +8,7 @@ use Date::Parse;
 use File::Basename;
 use File::Copy;
 
-use constant FILE_EXTENSIONS => qw(jpg jpeg png);
+use constant FILE_EXTENSIONS => qw(jpg jpeg png JPG JPEG PNG);
 
 sub new {
     my ($class, $args) = @_;
@@ -37,24 +37,14 @@ sub organize {
     }
 
     foreach (@files) {
-        print "File $_\n";
+        print "Coping file $_\n";
         my $destination = $self->_get_file_dest_directory($_);
         print "Copy to $destination\n";
-        copy($_, $destination) or die "Copy failed: $!";
+        if(copy($_, $destination)) {
+            unlink $_;
+            print "File $_ copied\n";
+        }
     }
-
-    # loop files
-        # select first file
-        # compose destination
-            # destination directory (hour)
-            # destination name (time)
-            # is there a file in the same time?
-                # append _1 to filename
-                # filename
-        # copy to destination
-        # delete origin file
-    # end loop files
-    # exit
 }
 
 sub _check_directory_exists {
@@ -79,17 +69,6 @@ sub _confirm {
 
     return $organize eq "y";
 }
-
-# sub list_files {
-#     my $self = shift;
-
-#     foreach (@files) {
-#         # copy("sourcefile", "destinationfile") or die "Copy failed: $!";
-#         print $self->get_file_dest_directory($_) . "\n";
-#     }
-
-#     print "Total files: " . scalar(@files) . "\n";
-# }
 
 sub _get_file_dest_directory {
     my $self = shift;
