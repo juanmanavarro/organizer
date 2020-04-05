@@ -30,8 +30,10 @@ sub organize {
         die("No images files in $self->{directory}");
     }
 
-    # check directory has images in it
-    # prompt organize files??
+    if(! $self->_confirm()) {
+        die();
+    }
+
     # loop files
         # select first file
         # compose destination
@@ -58,6 +60,14 @@ sub _check_directory_has_images {
     my @files = glob( $directory_files_glob );
 
     return scalar(@files);
+}
+
+sub _confirm {
+    print "Organize files? [y|n] ";
+    my $organize = <STDIN>;
+    chomp($organize);
+
+    return $organize eq "y";
 }
 
 # sub list_files {
